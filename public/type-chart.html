@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Type Chart - Pokémon Raid Helper</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="type-chart.css">
+</head>
+<body>
+  <!-- Header med titel -->
+  <header>
+    <h1>Pokémon Type Chart</h1>
+    <p>Vælg 1-2 typer for at se weaknesses, resistances og effectiveness</p>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+      <span class="theme-icon">🌙</span>
+      <span class="theme-toggle-text">Dark Mode</span>
+    </button>
+  </header>
+
+  <!-- Navigation tilbage -->
+  <div class="type-chart-nav">
+    <a href="index.html" class="back-link">← Tilbage til Pokémon liste</a>
+  </div>
+
+  <!-- Type vælger -->
+  <div class="type-selector-container">
+    <h2>Vælg type(r)</h2>
+    <div class="type-selector-grid" id="type-selector">
+      <!-- Type buttons genereres med JavaScript -->
+    </div>
+    <button id="clear-types" class="clear-types-btn" style="display: none;">Ryd valg</button>
+  </div>
+
+  <!-- Resultater -->
+  <div class="type-results-container" id="type-results" style="display: none;">
+    <!-- Defensive (hvad denne type/kombination er svag/resistent imod) -->
+    <div class="type-result-section defensive-section">
+      <h2>🛡️ Defensivt (Tager damage fra)</h2>
+
+      <div class="type-effectiveness-group">
+        <h3 class="weakness-header">⚠️ Svag imod (tager ekstra damage)</h3>
+        <div id="defensive-weaknesses" class="type-badges-container">
+          <!-- Weaknesses vises her -->
+        </div>
+      </div>
+
+      <div class="type-effectiveness-group">
+        <h3 class="resistance-header">✅ Modstår (tager reduceret damage)</h3>
+        <div id="defensive-resistances" class="type-badges-container">
+          <!-- Resistances vises her -->
+        </div>
+      </div>
+
+      <div class="type-effectiveness-group">
+        <h3 class="neutral-header">➖ Neutralt (normal damage)</h3>
+        <div id="defensive-neutral" class="type-badges-container">
+          <!-- Neutral types vises her -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Offensive (hvad denne type gør godt/dårligt damage imod) -->
+    <div class="type-result-section offensive-section">
+      <h2>⚔️ Offensivt (Gør damage til)</h2>
+
+      <div class="type-effectiveness-group">
+        <h3 class="super-effective-header">💥 Super effective imod (gør ekstra damage)</h3>
+        <div id="offensive-super-effective" class="type-badges-container">
+          <!-- Super effective vises her -->
+        </div>
+      </div>
+
+      <div class="type-effectiveness-group">
+        <h3 class="not-very-effective-header">🔻 Not very effective imod (gør reduceret damage)</h3>
+        <div id="offensive-not-effective" class="type-badges-container">
+          <!-- Not very effective vises her -->
+        </div>
+      </div>
+
+      <div class="type-effectiveness-group">
+        <h3 class="immune-header">🚫 Ingen effekt imod (0x damage)</h3>
+        <div id="offensive-immune" class="type-badges-container">
+          <!-- Immune vises her -->
+        </div>
+      </div>
+
+      <div class="type-effectiveness-group">
+        <h3 class="neutral-header">➖ Neutralt imod (normal damage)</h3>
+        <div id="offensive-neutral" class="type-badges-container">
+          <!-- Neutral types vises her -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="type-chart.js"></script>
+</body>
+</html>
