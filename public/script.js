@@ -1,6 +1,175 @@
 // JavaScript kode til Pokémon Raid Helper
 console.log('Pokémon Raid Helper er startet!');
 
+// ============================================
+// SPROG / LANGUAGE SYSTEM
+// ============================================
+
+// Nuværende sprog (default: dansk)
+let currentLanguage = localStorage.getItem('pokemon-raid-language') || 'da';
+
+// Oversættelser
+const translations = {
+  da: {
+    subtitle: 'Find de bedste counters til raids',
+    weather_title: '☀️ Nuværende vejr',
+    weather_none: 'Intet valgt',
+    weather_boost_text: 'Pokémon af disse typer får +5 levels i vejret (level 20 → 25 for raids)',
+    boosted_types: 'Boosted typer:',
+    search_placeholder: "Søg efter Pokémon navn eller type (f.eks. 'Mewtwo' eller 'Dragon')...",
+    filter_title: 'Filtrer efter kategori:',
+    filter_all: 'Alle (218)',
+    sort_title: 'Sorter efter:',
+    sort_name: 'Navn (A-Z)',
+    compare_title: 'Sammenlign',
+    compare_btn: 'Sammenlign',
+    compare_clear: 'Ryd alle',
+    comparison_title: 'Sammenligning',
+    back_btn: '← Tilbage',
+    // Detalje-side
+    stats: 'Stats',
+    base_stats: 'Base Stats',
+    cp_levels: 'CP ved forskellige levels',
+    best_moveset: 'Bedste Moveset',
+    fast_move: 'Fast Move',
+    charged_move: 'Charged Move',
+    weaknesses: 'Svagheder',
+    resistances: 'Resistenser',
+    raid_counters: 'Raid Counters',
+    raid_difficulty: 'Raid Sværhedsgrad',
+    players_needed: 'Spillere krævet',
+    shiny_available: 'Shiny tilgængelig',
+    shiny_yes: 'Ja',
+    shiny_no: 'Nej',
+    add_to_compare: 'Tilføj til sammenligning',
+    remove_from_compare: 'Fjern fra sammenligning',
+    close: 'Luk',
+    // Type Chart
+    type_chart: 'Type Chart',
+    select_types: 'Vælg type(r)',
+    defensive: 'Defensivt (Tager damage fra)',
+    offensive: 'Offensivt (Gør damage til)',
+    super_effective: 'Super effektiv mod',
+    not_effective: 'Ikke effektiv mod',
+    immune: 'Immun mod',
+    weak_to: 'Svag mod',
+    resistant_to: 'Resistent mod',
+    no_selection: 'Vælg 1-2 typer ovenfor for at se effektivitet',
+    clear_selection: 'Ryd valg'
+  },
+  en: {
+    subtitle: 'Find the best counters for raids',
+    weather_title: '☀️ Current weather',
+    weather_none: 'None selected',
+    weather_boost_text: 'Pokémon of these types get +5 levels in weather (level 20 → 25 for raids)',
+    boosted_types: 'Boosted types:',
+    search_placeholder: "Search for Pokémon name or type (e.g. 'Mewtwo' or 'Dragon')...",
+    filter_title: 'Filter by category:',
+    filter_all: 'All (218)',
+    sort_title: 'Sort by:',
+    sort_name: 'Name (A-Z)',
+    compare_title: 'Compare',
+    compare_btn: 'Compare',
+    compare_clear: 'Clear all',
+    comparison_title: 'Comparison',
+    back_btn: '← Back',
+    // Detail page
+    stats: 'Stats',
+    base_stats: 'Base Stats',
+    cp_levels: 'CP at different levels',
+    best_moveset: 'Best Moveset',
+    fast_move: 'Fast Move',
+    charged_move: 'Charged Move',
+    weaknesses: 'Weaknesses',
+    resistances: 'Resistances',
+    raid_counters: 'Raid Counters',
+    raid_difficulty: 'Raid Difficulty',
+    players_needed: 'Players needed',
+    shiny_available: 'Shiny available',
+    shiny_yes: 'Yes',
+    shiny_no: 'No',
+    add_to_compare: 'Add to comparison',
+    remove_from_compare: 'Remove from comparison',
+    close: 'Close',
+    // Type Chart
+    type_chart: 'Type Chart',
+    select_types: 'Select type(s)',
+    defensive: 'Defensive (Takes damage from)',
+    offensive: 'Offensive (Deals damage to)',
+    super_effective: 'Super effective against',
+    not_effective: 'Not very effective against',
+    immune: 'Immune to',
+    weak_to: 'Weak to',
+    resistant_to: 'Resistant to',
+    no_selection: 'Select 1-2 types above to see effectiveness',
+    clear_selection: 'Clear selection'
+  }
+};
+
+// Funktion til at hente oversættelse
+function t(key) {
+  return translations[currentLanguage][key] || translations['da'][key] || key;
+}
+
+// Funktion til at opdatere alle oversættelser på siden
+function updatePageLanguage() {
+  // Opdater alle elementer med data-i18n attribut
+  document.querySelectorAll('[data-i18n]').forEach(element => {
+    const key = element.getAttribute('data-i18n');
+    if (translations[currentLanguage][key]) {
+      element.textContent = translations[currentLanguage][key];
+    }
+  });
+
+  // Opdater placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+    const key = element.getAttribute('data-i18n-placeholder');
+    if (translations[currentLanguage][key]) {
+      element.placeholder = translations[currentLanguage][key];
+    }
+  });
+
+  // Opdater HTML lang attribut
+  document.documentElement.lang = currentLanguage === 'da' ? 'da' : 'en';
+
+  // Opdater sprog-knappen
+  const langToggle = document.getElementById('lang-toggle');
+  if (langToggle) {
+    const flag = langToggle.querySelector('.lang-flag');
+    const text = langToggle.querySelector('.lang-text');
+    if (currentLanguage === 'da') {
+      flag.textContent = '🇬🇧';
+      text.textContent = 'English';
+    } else {
+      flag.textContent = '🇩🇰';
+      text.textContent = 'Dansk';
+    }
+  }
+}
+
+// Funktion til at skifte sprog
+function toggleLanguage() {
+  currentLanguage = currentLanguage === 'da' ? 'en' : 'da';
+  localStorage.setItem('pokemon-raid-language', currentLanguage);
+  updatePageLanguage();
+
+  // Genindlæs Pokémon for at opdatere detaljer
+  if (typeof loadPokemon === 'function') {
+    loadPokemon();
+  }
+}
+
+// Initialiser sprog ved load
+document.addEventListener('DOMContentLoaded', () => {
+  updatePageLanguage();
+
+  // Tilføj event listener til sprog-knappen
+  const langToggle = document.getElementById('lang-toggle');
+  if (langToggle) {
+    langToggle.addEventListener('click', toggleLanguage);
+  }
+});
+
 // Hjælpe-funktion til at konvertere Pokémon navn til sprite navn
 function getPokemonSpriteName(name) {
   // Konverter til lowercase
@@ -13,6 +182,21 @@ function getPokemonSpriteName(name) {
   } else if (spriteName.includes('mega charizard y')) {
     // "Mega Charizard Y" → "charizard-mega-y"
     spriteName = 'charizard-mega-y';
+  } else if (spriteName.includes('mega charizard x')) {
+    // "Mega Charizard X" → "charizard-mega-x"
+    spriteName = 'charizard-mega-x';
+  } else if (spriteName.includes('zygarde 50%')) {
+    // "Zygarde 50%" → "zygarde"
+    spriteName = 'zygarde';
+  } else if (spriteName.includes('galarian darmanitan')) {
+    // "Galarian Darmanitan" → "darmanitan-galar-standard"
+    spriteName = 'darmanitan-galar-standard';
+  } else if (spriteName.includes('ice rider calyrex')) {
+    // "Ice Rider Calyrex" → "calyrex-ice-rider"
+    spriteName = 'calyrex-ice-rider';
+  } else if (spriteName.includes('shadow rider calyrex')) {
+    // "Shadow Rider Calyrex" → "calyrex-shadow-rider"
+    spriteName = 'calyrex-shadow-rider';
   } else if (spriteName.includes('mega')) {
     // "Mega Rayquaza" → "rayquaza-mega"
     spriteName = spriteName.replace('mega ', '') + '-mega';

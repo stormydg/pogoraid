@@ -1,3 +1,83 @@
+// ============================================
+// SPROG / LANGUAGE SYSTEM for Type Chart
+// ============================================
+
+// Nuværende sprog (læs fra localStorage)
+let currentLanguage = localStorage.getItem('pokemon-raid-language') || 'da';
+
+// Oversættelser for Type Chart
+const translations = {
+  da: {
+    type_chart_title: 'Pokémon Type Chart',
+    type_chart_subtitle: 'Vælg 1-2 typer for at se weaknesses, resistances og effectiveness',
+    back_to_list: '← Tilbage til Pokémon liste',
+    select_types: 'Vælg type(r)',
+    clear_selection: 'Ryd valg',
+    defensive_title: '🛡️ Defensivt (Tager damage fra)',
+    offensive_title: '⚔️ Offensivt (Gør damage til)',
+    weak_against: '⚠️ Svag imod (tager ekstra damage)',
+    resistant_against: '✅ Modstår (tager reduceret damage)',
+    neutral_defense: '➖ Neutralt (normal damage)',
+    super_effective_against: '💥 Super effective imod (gør ekstra damage)',
+    not_effective_against: '🔻 Not very effective imod (gør reduceret damage)',
+    no_effect_against: '🚫 Ingen effekt imod (0x damage)',
+    neutral_offense: '➖ Neutralt imod (normal damage)'
+  },
+  en: {
+    type_chart_title: 'Pokémon Type Chart',
+    type_chart_subtitle: 'Select 1-2 types to see weaknesses, resistances and effectiveness',
+    back_to_list: '← Back to Pokémon list',
+    select_types: 'Select type(s)',
+    clear_selection: 'Clear selection',
+    defensive_title: '🛡️ Defensive (Takes damage from)',
+    offensive_title: '⚔️ Offensive (Deals damage to)',
+    weak_against: '⚠️ Weak to (takes extra damage)',
+    resistant_against: '✅ Resists (takes reduced damage)',
+    neutral_defense: '➖ Neutral (normal damage)',
+    super_effective_against: '💥 Super effective against (deals extra damage)',
+    not_effective_against: '🔻 Not very effective against (deals reduced damage)',
+    no_effect_against: '🚫 No effect against (0x damage)',
+    neutral_offense: '➖ Neutral against (normal damage)'
+  }
+};
+
+// Funktion til at hente oversættelse
+function t(key) {
+  return translations[currentLanguage][key] || translations['da'][key] || key;
+}
+
+// Funktion til at opdatere alle oversættelser på siden
+function updatePageLanguage() {
+  document.querySelectorAll('[data-i18n]').forEach(element => {
+    const key = element.getAttribute('data-i18n');
+    if (translations[currentLanguage][key]) {
+      element.textContent = translations[currentLanguage][key];
+    }
+  });
+
+  document.documentElement.lang = currentLanguage === 'da' ? 'da' : 'en';
+
+  const langToggle = document.getElementById('lang-toggle');
+  if (langToggle) {
+    const flag = langToggle.querySelector('.lang-flag');
+    const text = langToggle.querySelector('.lang-text');
+    if (currentLanguage === 'da') {
+      flag.textContent = '🇬🇧';
+      text.textContent = 'English';
+    } else {
+      flag.textContent = '🇩🇰';
+      text.textContent = 'Dansk';
+    }
+  }
+}
+
+// Funktion til at skifte sprog
+function toggleLanguage() {
+  currentLanguage = currentLanguage === 'da' ? 'en' : 'da';
+  localStorage.setItem('pokemon-raid-language', currentLanguage);
+  updatePageLanguage();
+}
+
 // Type effectiveness data - Pokémon GO mechanics (1.6x, 0.625x)
 const TYPE_CHART = {
   // Defensive weaknesses (what attacks hurt this type)
@@ -135,8 +215,15 @@ function setupDarkMode() {
 function init() {
   setupDarkMode();
   renderTypeSelector();
+  updatePageLanguage();
 
   document.getElementById('clear-types').addEventListener('click', clearTypeSelection);
+
+  // Language toggle
+  const langToggle = document.getElementById('lang-toggle');
+  if (langToggle) {
+    langToggle.addEventListener('click', toggleLanguage);
+  }
 }
 
 // Render type selector buttons

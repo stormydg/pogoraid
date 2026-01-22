@@ -13,11 +13,15 @@
   <header>
     <div class="header-content">
       <h1>Pokémon Raid Helper</h1>
-      <p>Find de bedste counters til raids</p>
+      <p data-i18n="subtitle">Find de bedste counters til raids</p>
     </div>
     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
       <span class="theme-icon">🌙</span>
       <span class="theme-toggle-text">Dark Mode</span>
+    </button>
+    <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">
+      <span class="lang-flag">🇬🇧</span>
+      <span class="lang-text">English</span>
     </button>
   </header>
 
@@ -28,11 +32,11 @@
 
   <!-- Vejr selector -->
   <div class="weather-container">
-    <h3>☀️ Nuværende vejr</h3>
+    <h3 data-i18n="weather_title">☀️ Nuværende vejr</h3>
     <div class="weather-buttons" id="weather-buttons">
       <button class="weather-btn active" data-weather="none">
         <span class="weather-icon">❔</span>
-        <span class="weather-name">Intet valgt</span>
+        <span class="weather-name" data-i18n="weather_none">Intet valgt</span>
       </button>
       <button class="weather-btn" data-weather="sunny">
         <span class="weather-icon">☀️</span>
@@ -74,6 +78,7 @@
       type="text"
       id="search-input"
       placeholder="Søg efter Pokémon navn eller type (f.eks. 'Mewtwo' eller 'Dragon')..."
+      data-i18n-placeholder="search_placeholder"
       autocomplete="off"
     >
     <button id="clear-search" style="display: none;">✕</button>
@@ -81,29 +86,29 @@
 
   <!-- Filter sektion -->
   <div class="filter-container">
-    <h3>Filtrer efter kategori:</h3>
+    <h3 data-i18n="filter_title">Filtrer efter kategori:</h3>
     <div class="filter-buttons">
-      <button class="filter-btn active" data-category="all">Alle (139)</button>
-      <button class="filter-btn" data-category="Legendary">Legendary (62)</button>
-      <button class="filter-btn" data-category="Mythical">Mythical (13)</button>
-      <button class="filter-btn" data-category="Mega">Mega (14)</button>
+      <button class="filter-btn active" data-category="all" data-i18n="filter_all">Alle (218)</button>
+      <button class="filter-btn" data-category="Legendary">Legendary (74)</button>
+      <button class="filter-btn" data-category="Mythical">Mythical (20)</button>
+      <button class="filter-btn" data-category="Mega">Mega (36)</button>
       <button class="filter-btn" data-category="Primal">Primal (2)</button>
-      <button class="filter-btn" data-category="Shadow">Shadow (15)</button>
+      <button class="filter-btn" data-category="Shadow">Shadow (29)</button>
       <button class="filter-btn" data-category="Ultra Beast">Ultra Beast (7)</button>
-      <button class="filter-btn" data-category="Normal">Normal (26)</button>
+      <button class="filter-btn" data-category="Normal">Normal (50)</button>
     </div>
   </div>
 
   <!-- Sortering sektion -->
   <div class="sort-container">
-    <h3>Sorter efter:</h3>
+    <h3 data-i18n="sort_title">Sorter efter:</h3>
     <div class="sort-buttons">
       <button class="sort-btn active" data-sort="pokedex">Pokédex Nr.</button>
       <button class="sort-btn" data-sort="cp">Max CP</button>
       <button class="sort-btn" data-sort="attack">Attack</button>
       <button class="sort-btn" data-sort="defense">Defense</button>
       <button class="sort-btn" data-sort="hp">HP</button>
-      <button class="sort-btn" data-sort="name">Navn (A-Z)</button>
+      <button class="sort-btn" data-sort="name" data-i18n="sort_name">Navn (A-Z)</button>
     </div>
   </div>
 
@@ -120,17 +125,17 @@
   <!-- Compare floating panel -->
   <div id="compare-panel" class="compare-panel hidden">
     <div class="compare-header">
-      <h3>Sammenlign (<span id="compare-count">0</span>/6)</h3>
+      <h3><span data-i18n="compare_title">Sammenlign</span> (<span id="compare-count">0</span>/6)</h3>
       <button class="compare-close" onclick="closeComparePanel()">×</button>
     </div>
     <div id="compare-list" class="compare-list">
       <!-- Compare items vil blive tilføjet her -->
     </div>
     <div class="compare-actions">
-      <button class="compare-btn compare-btn-primary" id="show-comparison" onclick="showComparison()" disabled>
+      <button class="compare-btn compare-btn-primary" id="show-comparison" onclick="showComparison()" disabled data-i18n="compare_btn">
         Sammenlign
       </button>
-      <button class="compare-btn compare-btn-secondary" onclick="clearComparison()">
+      <button class="compare-btn compare-btn-secondary" onclick="clearComparison()" data-i18n="compare_clear">
         Ryd alle
       </button>
     </div>
@@ -139,8 +144,8 @@
   <!-- Compare view (full screen) -->
   <div id="compare-view" class="compare-view">
     <div class="compare-view-header">
-      <h2>Sammenligning</h2>
-      <button class="compare-view-close" onclick="closeCompareView()">← Tilbage</button>
+      <h2 data-i18n="comparison_title">Sammenligning</h2>
+      <button class="compare-view-close" onclick="closeCompareView()" data-i18n="back_btn">← Tilbage</button>
     </div>
     <div id="compare-grid" class="compare-grid">
       <!-- Comparison cards vil blive tilføjet her -->
