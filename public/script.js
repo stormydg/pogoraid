@@ -616,7 +616,7 @@ async function loadPokemonByName(name) {
 
 // Global variabel til at gemme alle Pokémon
 let allPokemonData = [];
-let activeCategory = 'all';
+let activeCategories = []; // Array af valgte kategorier (tom = alle)
 let activeSortBy = 'pokedex';
 
 // Funktion der filtrerer Pokémon baseret på søgning og kategori
@@ -627,9 +627,9 @@ function filterPokemon(searchTerm) {
   // Start med alle Pokémon
   let filtered = allPokemonData;
 
-  // Filtrer efter kategori først
-  if (activeCategory !== 'all') {
-    filtered = filtered.filter(pokemon => pokemon.category === activeCategory);
+  // Filtrer efter kategorier (hvis nogen er valgt)
+  if (activeCategories.length > 0) {
+    filtered = filtered.filter(pokemon => activeCategories.includes(pokemon.category));
   }
 
   // Hvis der er en søgning, filtrer yderligere
@@ -645,7 +645,7 @@ function filterPokemon(searchTerm) {
   displayPokemon(filtered);
 
   // Vis antal resultater i console
-  console.log(`Viser ${filtered.length} Pokémon (kategori: ${activeCategory}, søgning: "${searchTerm}")`);
+  console.log(`Viser ${filtered.length} Pokémon (kategorier: ${activeCategories.length > 0 ? activeCategories.join(', ') : 'alle'}, søgning: "${searchTerm}")`);
 }
 
 // Opdater loadPokemon til at gemme data globalt
@@ -699,21 +699,41 @@ function setupCategoryFilter() {
 
   filterButtons.forEach(button => {
     button.addEventListener('click', () => {
-      // Fjern 'active' class fra alle knapper
-      filterButtons.forEach(btn => btn.classList.remove('active'));
+      const category = button.getAttribute('data-category');
 
-      // Tilføj 'active' class til den klikkede knap
-      button.classList.add('active');
+      if (category === 'all') {
+        // "Alle" knappen - ryd alle valg og vis alle
+        activeCategories = [];
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+      } else {
+        // Fjern "Alle" knappens active class
+        const allButton = document.querySelector('.filter-btn[data-category="all"]');
+        allButton.classList.remove('active');
 
-      // Hent kategorien fra data-category attributten
-      activeCategory = button.getAttribute('data-category');
+        // Toggle denne kategori
+        if (button.classList.contains('active')) {
+          // Fjern fra valgte kategorier
+          button.classList.remove('active');
+          activeCategories = activeCategories.filter(c => c !== category);
+
+          // Hvis ingen kategorier er valgt, aktiver "Alle"
+          if (activeCategories.length === 0) {
+            allButton.classList.add('active');
+          }
+        } else {
+          // Tilføj til valgte kategorier
+          button.classList.add('active');
+          activeCategories.push(category);
+        }
+      }
 
       // Filtrer Pokémon (brug current søgning hvis den findes)
       const searchInput = document.getElementById('search-input');
       filterPokemon(searchInput.value);
 
-      // Log valgt kategori
-      console.log('Valgt kategori:', activeCategory);
+      // Log valgte kategorier
+      console.log('Valgte kategorier:', activeCategories.length > 0 ? activeCategories : ['alle']);
     });
   });
 }
