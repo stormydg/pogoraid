@@ -2,3 +2,5 @@ node_modules/
 server.log
 *.log
 .DS_Store
+screenshot.png
+*.png

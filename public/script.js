@@ -1,6 +1,15 @@
 // JavaScript kode til Pokémon Raid Helper
 console.log('Pokémon Raid Helper er startet!');
 
+// Helper funktion til at formatere TTW (Time To Win)
+function formatTTW(seconds) {
+  if (!seconds || seconds <= 0) return 'N/A';
+  if (seconds < 60) return `${seconds}s`;
+  const minutes = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return secs > 0 ? `${minutes}m ${secs}s` : `${minutes}m`;
+}
+
 // ============================================
 // SPROG / LANGUAGE SYSTEM
 // ============================================
@@ -36,6 +45,8 @@ const translations = {
     weaknesses: 'Svagheder',
     resistances: 'Resistenser',
     raid_counters: 'Raid Counters',
+    top_counters_header: 'Top Counters (DPS Ranked)',
+    type_counters_header: 'Counters efter Type',
     raid_difficulty: 'Raid Sværhedsgrad',
     players_needed: 'Spillere krævet',
     shiny_available: 'Shiny tilgængelig',
@@ -83,6 +94,8 @@ const translations = {
     weaknesses: 'Weaknesses',
     resistances: 'Resistances',
     raid_counters: 'Raid Counters',
+    top_counters_header: 'Top Counters (DPS Ranked)',
+    type_counters_header: 'Counters by Type',
     raid_difficulty: 'Raid Difficulty',
     players_needed: 'Players needed',
     shiny_available: 'Shiny available',
@@ -227,6 +240,33 @@ function getPokemonSpriteName(name) {
   } else if (spriteName.includes('shadow')) {
     // "Shadow Raikou" → "raikou" (shadow bruger normal sprite)
     spriteName = spriteName.replace('shadow ', '');
+  } else if (spriteName.includes('hisuian typhlosion')) {
+    // "Hisuian Typhlosion" → "typhlosion-hisuian"
+    spriteName = 'typhlosion-hisuian';
+  } else if (spriteName.includes('hisuian samurott')) {
+    // "Hisuian Samurott" → "samurott-hisuian"
+    spriteName = 'samurott-hisuian';
+  } else if (spriteName.includes('hisuian decidueye')) {
+    // "Hisuian Decidueye" → "decidueye-hisuian"
+    spriteName = 'decidueye-hisuian';
+  } else if (spriteName.includes('hisuian')) {
+    // Generel Hisuian håndtering: "Hisuian X" → "x-hisuian"
+    spriteName = spriteName.replace('hisuian ', '') + '-hisuian';
+  } else if (spriteName.includes('galarian')) {
+    // Generel Galarian håndtering: "Galarian X" → "x-galar"
+    spriteName = spriteName.replace('galarian ', '') + '-galar';
+  } else if (spriteName.includes('alolan')) {
+    // Generel Alolan håndtering: "Alolan X" → "x-alola"
+    spriteName = spriteName.replace('alolan ', '') + '-alola';
+  } else if (spriteName.includes('paldean')) {
+    // Generel Paldean håndtering: "Paldean X" → "x-paldea"
+    spriteName = spriteName.replace('paldean ', '') + '-paldea';
+  } else if (spriteName.includes('single strike')) {
+    // "Urshifu Single Strike" → "urshifu-single-strike"
+    spriteName = spriteName.replace(' single strike', '-single-strike');
+  } else if (spriteName.includes('rapid strike')) {
+    // "Urshifu Rapid Strike" → "urshifu-rapid-strike"
+    spriteName = spriteName.replace(' rapid strike', '-rapid-strike');
   }
 
   // Fjern mellemrum og erstat med bindestreg
@@ -492,16 +532,40 @@ function displayPokemonDetails(pokemon) {
     `;
   }
 
-  // Byg counter liste opdelt efter type
+  // Byg counter liste - først top counters fra PokemonGOHub, derefter type-baserede
   let countersList = '<div class="counters-list">';
 
-  // Loop gennem hver weakness type
+  // Vis top counters fra PokemonGOHub (hvis de findes)
+  if (pokemon.top_counters && pokemon.top_counters.length > 0) {
+    countersList += `<h4 class="counter-type-header top-counters-header">${t('top_counters_header', currentLanguage) || 'Top Counters (DPS Ranked)'}</h4>`;
+
+    pokemon.top_counters.forEach((counter, index) => {
+      const counterSpriteUrl = getSpriteUrl(counter.counter_name, false);
+      const rankBadge = index < 3 ? `<span class="rank-badge rank-${index + 1}">#${index + 1}</span>` : `<span class="rank-badge">#${index + 1}</span>`;
+
+      countersList += `
+        <div class="counter-card clickable-counter top-counter" data-name="${counter.counter_name}" onclick="loadPokemonByName('${counter.counter_name}')">
+          ${rankBadge}
+          <img src="${counterSpriteUrl}" alt="${counter.counter_name}" class="counter-sprite" onerror="this.style.display='none'">
+          <div class="counter-info">
+            <h4>${counter.counter_name}</h4>
+            <p class="moveset">${counter.counter_moveset}</p>
+            <p class="dps-value">DPS: ${counter.dps.toFixed(1)} | TTW: ${formatTTW(counter.ttw)}</p>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  // Vis også type-baserede counters som fallback/ekstra info
+  countersList += `<h4 class="counter-type-header type-counters-header">${t('type_counters_header', currentLanguage) || 'Counters by Type'}</h4>`;
+
   Object.keys(pokemon.counters_by_type).forEach(type => {
     const typeData = pokemon.counters_by_type[type];
     const multiplier = typeData.multiplier;
 
     // Tilføj type overskrift med multiplier
-    countersList += `<h4 class="counter-type-header">${type} Attackers (${multiplier} weakness)</h4>`;
+    countersList += `<h5 class="counter-subtype-header">${type} (${multiplier})</h5>`;
 
     // Tilføj de 3 bedste attackers af denne type
     typeData.attackers.forEach(counter => {

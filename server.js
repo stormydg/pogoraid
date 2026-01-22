@@ -39,8 +39,15 @@ app.get('/api/pokemon/:id', (req, res) => {
   // Hent CP værdier
   const cpValues = db.prepare('SELECT level, cp FROM cp_values WHERE pokemon_id = ?').all(id);
 
-  // Hent counters baseret på weaknesses
-  // Parse weaknesses (format: "Water:2x,Grass:2x,Ice:4x")
+  // Hent top counters fra den nye counters tabel (scraped fra PokemonGOHub)
+  const topCounters = db.prepare(`
+    SELECT counter_name, counter_moveset, dps, ttw, rank
+    FROM counters
+    WHERE pokemon_id = ?
+    ORDER BY rank
+  `).all(id);
+
+  // Hent også counters baseret på weaknesses (den gamle metode som fallback)
   const weaknessArray = pokemon.weaknesses.split(',');
   const countersByType = {};
 
@@ -57,7 +64,8 @@ app.get('/api/pokemon/:id', (req, res) => {
   const fullData = {
     ...pokemon,
     cp_values: cpValues,
-    counters_by_type: countersByType
+    top_counters: topCounters,           // Nye scraped counters med DPS
+    counters_by_type: countersByType     // Fallback counters baseret på type
   };
 
   // Send data som JSON

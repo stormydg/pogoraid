@@ -793,6 +793,82 @@ header p {
   font-weight: bold;
 }
 
+/* Top counters med DPS */
+.top-counters-header {
+  background: linear-gradient(135deg, #ffd700, #ffb700);
+  color: #333;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.type-counters-header {
+  background: var(--bg-tertiary);
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin: 25px 0 15px 0;
+  font-size: 16px;
+  border-left: 4px solid var(--accent-blue);
+}
+
+.counter-subtype-header {
+  color: var(--text-secondary);
+  margin: 15px 0 10px 0;
+  font-size: 14px;
+  padding-left: 10px;
+  border-left: 3px solid var(--border-color);
+}
+
+.counter-card.top-counter {
+  position: relative;
+  border-left: 4px solid #ffd700;
+}
+
+.rank-badge {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  background: #666;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.rank-badge.rank-1 {
+  background: linear-gradient(135deg, #ffd700, #ffb700);
+  color: #333;
+  font-size: 14px;
+}
+
+.rank-badge.rank-2 {
+  background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+  color: #333;
+}
+
+.rank-badge.rank-3 {
+  background: linear-gradient(135deg, #cd7f32, #b87333);
+  color: white;
+}
+
+.dps-value {
+  margin: 5px 0;
+  color: #27ae60;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+[data-theme="dark"] .top-counters-header {
+  background: linear-gradient(135deg, #b8860b, #8b6914);
+  color: #fff;
+}
+
+[data-theme="dark"] .dps-value {
+  color: #2ecc71;
+}
+
 /* Resistances section */
 .resistances-section {
   background: linear-gradient(135deg, #f8f9fa, #e9ecef);
