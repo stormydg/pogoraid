@@ -13,8 +13,8 @@
   --border-light: #f0f0f0;
   --shadow: rgba(0,0,0,0.1);
   --shadow-hover: rgba(0,0,0,0.2);
-  --accent-red: #cc0000;
-  --accent-red-hover: #aa0000;
+  --accent-red: #6890F0;
+  --accent-red-hover: #5070D0;
   --accent-blue: #3498db;
 }
 
@@ -30,8 +30,8 @@
   --border-light: #353535;
   --shadow: rgba(0,0,0,0.4);
   --shadow-hover: rgba(0,0,0,0.6);
-  --accent-red: #ff3333;
-  --accent-red-hover: #ff5555;
+  --accent-red: #6890F0;
+  --accent-red-hover: #88B0FF;
   --accent-blue: #5dade2;
 }
 
@@ -208,7 +208,64 @@ header p {
   box-shadow: 0 4px 12px var(--shadow-hover);
 }
 
-/* Weather selector */
+/* Weather Dropdown */
+.weather-dropdown {
+  position: relative;
+}
+
+.weather-toggle {
+  cursor: pointer;
+  border: none;
+  font-size: 16px;
+}
+
+.weather-dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  box-shadow: 0 4px 15px var(--shadow-hover);
+  min-width: 180px;
+  z-index: 1000;
+  overflow: hidden;
+  margin-top: 5px;
+}
+
+.weather-dropdown-content.show {
+  display: block;
+}
+
+.weather-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-align: left;
+}
+
+.weather-option:hover {
+  background: var(--bg-tertiary);
+}
+
+.weather-option.active {
+  background: var(--accent-blue);
+  color: white;
+}
+
+.weather-option .weather-icon {
+  font-size: 18px;
+}
+
+/* Weather selector (old - keep for boost info) */
 .weather-container {
   max-width: 1200px;
   margin: 20px auto 0 auto;
@@ -478,6 +535,148 @@ header p {
   .sort-btn {
     font-size: 12px;
     padding: 8px 15px;
+  }
+}
+
+/* Range filter */
+.range-filter {
+  margin-top: 15px;
+  padding: 15px;
+  background: var(--bg-tertiary);
+  border-radius: 10px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.range-inputs label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.range-inputs input[type="number"] {
+  width: 100px;
+  padding: 8px 12px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.range-inputs input[type="number"]:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+.range-separator {
+  color: var(--text-secondary);
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.range-apply-btn {
+  padding: 8px 16px;
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.range-apply-btn:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+}
+
+.range-clear-btn {
+  padding: 8px 16px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.range-clear-btn:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--text-secondary);
+}
+
+.range-presets {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.range-preset-btn {
+  padding: 6px 12px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.range-preset-btn:hover {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+.range-preset-btn.active {
+  background: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+@media (max-width: 600px) {
+  .range-inputs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .range-inputs label {
+    width: 100%;
+  }
+
+  .range-inputs input[type="number"] {
+    width: 100%;
+  }
+
+  .range-separator {
+    display: none;
+  }
+
+  .range-apply-btn,
+  .range-clear-btn {
+    width: 100%;
   }
 }
 

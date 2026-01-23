@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pokémon Raid Helper</title>
+  <title>PogoRaid</title>
   <link rel="icon" type="image/png" href="https://img.pokemondb.net/sprites/home/normal/frogadier.png">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="compare.css">
@@ -12,7 +12,7 @@
   <!-- Header med titel -->
   <header>
     <div class="header-content">
-      <h1>Pokémon Raid Helper</h1>
+      <h1>PogoRaid</h1>
       <p data-i18n="subtitle">Find de bedste counters til raids</p>
     </div>
     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
@@ -28,48 +28,7 @@
   <!-- Navigation links -->
   <div class="nav-links">
     <a href="type-chart.html" class="nav-link">📊 Type Chart</a>
-  </div>
-
-  <!-- Vejr selector -->
-  <div class="weather-container">
-    <h3 data-i18n="weather_title">☀️ Nuværende vejr</h3>
-    <div class="weather-buttons" id="weather-buttons">
-      <button class="weather-btn active" data-weather="none">
-        <span class="weather-icon">❔</span>
-        <span class="weather-name" data-i18n="weather_none">Intet valgt</span>
-      </button>
-      <button class="weather-btn" data-weather="sunny">
-        <span class="weather-icon">☀️</span>
-        <span class="weather-name">Sunny</span>
-      </button>
-      <button class="weather-btn" data-weather="rainy">
-        <span class="weather-icon">🌧️</span>
-        <span class="weather-name">Rainy</span>
-      </button>
-      <button class="weather-btn" data-weather="partlycloudy">
-        <span class="weather-icon">⛅</span>
-        <span class="weather-name">Partly Cloudy</span>
-      </button>
-      <button class="weather-btn" data-weather="cloudy">
-        <span class="weather-icon">☁️</span>
-        <span class="weather-name">Cloudy</span>
-      </button>
-      <button class="weather-btn" data-weather="windy">
-        <span class="weather-icon">💨</span>
-        <span class="weather-name">Windy</span>
-      </button>
-      <button class="weather-btn" data-weather="snow">
-        <span class="weather-icon">❄️</span>
-        <span class="weather-name">Snow</span>
-      </button>
-      <button class="weather-btn" data-weather="fog">
-        <span class="weather-icon">🌫️</span>
-        <span class="weather-name">Fog</span>
-      </button>
-    </div>
-    <div id="weather-boost-info" class="weather-boost-info" style="display: none;">
-      <!-- Boosted types vises her -->
-    </div>
+    <a href="weather.html" class="nav-link">☀️ Weather Boosts</a>
   </div>
 
   <!-- Søgefelt -->
@@ -109,6 +68,26 @@
       <button class="sort-btn" data-sort="defense">Defense</button>
       <button class="sort-btn" data-sort="hp">HP</button>
       <button class="sort-btn" data-sort="name" data-i18n="sort_name">Navn (A-Z)</button>
+    </div>
+
+    <!-- Range filter (vises kun når en numerisk sortering er valgt) -->
+    <div id="range-filter" class="range-filter" style="display: none;">
+      <div class="range-inputs">
+        <label>
+          <span id="range-label-min">Min:</span>
+          <input type="number" id="range-min" placeholder="0">
+        </label>
+        <span class="range-separator">-</span>
+        <label>
+          <span id="range-label-max">Max:</span>
+          <input type="number" id="range-max" placeholder="9999">
+        </label>
+        <button id="apply-range" class="range-apply-btn">Anvend</button>
+        <button id="clear-range" class="range-clear-btn">Ryd</button>
+      </div>
+      <div class="range-presets" id="range-presets">
+        <!-- Presets tilføjes dynamisk baseret på valgt sortering -->
+      </div>
     </div>
   </div>
 

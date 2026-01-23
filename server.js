@@ -11,6 +11,14 @@ const app = express();
 app.use(express.json()); // Parser JSON i request body
 app.use(express.static('public')); // Server static files
 
+// Disable caching for API endpoints
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
+
 // Vælg hvilken port serveren skal lytte på
 const PORT = 3000;
 
@@ -74,6 +82,6 @@ app.get('/api/pokemon/:id', (req, res) => {
 
 // Start serveren
 app.listen(PORT, () => {
-  console.log(`Pokémon Raid Helper kører på http://localhost:${PORT}`);
+  console.log(`PogoRaid kører på http://localhost:${PORT}`);
   console.log('Tryk Ctrl+C for at stoppe serveren');
 });

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Boosts - PogoRaid</title>
+  <link rel="icon" type="image/png" href="https://img.pokemondb.net/sprites/home/normal/frogadier.png">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .weather-page-container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+
+    .weather-nav {
+      max-width: 1200px;
+      margin: 20px auto 0 auto;
+      padding: 0 20px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--accent-blue);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+      background: #2980b9;
+      transform: translateY(-3px);
+    }
+
+    .weather-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .weather-card {
+      background: var(--bg-secondary);
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 2px 8px var(--shadow);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 3px solid transparent;
+    }
+
+    .weather-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px var(--shadow-hover);
+    }
+
+    .weather-card.active {
+      border-color: var(--accent-blue);
+    }
+
+    .weather-card-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .weather-card-icon {
+      font-size: 48px;
+    }
+
+    .weather-card-name {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--text-primary);
+    }
+
+    .weather-card h4 {
+      margin: 0 0 10px 0;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .boosted-types-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .type-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .weather-info-box {
+      background: var(--bg-tertiary);
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 30px;
+    }
+
+    .weather-info-box h3 {
+      margin: 0 0 15px 0;
+      color: var(--text-primary);
+    }
+
+    .weather-info-box p {
+      margin: 0;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .weather-info-box ul {
+      margin: 10px 0 0 0;
+      padding-left: 20px;
+      color: var(--text-secondary);
+    }
+
+    .weather-info-box li {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Weather Boosts</h1>
+    <p>Se hvilke typer der boostes af hvert vejr i Pokémon GO</p>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+      <span class="theme-icon">🌙</span>
+      <span class="theme-toggle-text">Dark Mode</span>
+    </button>
+  </header>
+
+  <div class="weather-nav">
+    <a href="index.html" class="back-link">← Tilbage til Pokémon liste</a>
+  </div>
+
+  <div class="weather-page-container">
+    <div class="weather-grid" id="weather-grid">
+      <!-- Weather cards genereres her -->
+    </div>
+
+    <div class="weather-info-box">
+      <h3>Hvad betyder Weather Boost?</h3>
+      <p>I Pokémon GO påvirker vejret spillet på flere måder:</p>
+      <ul>
+        <li><strong>Raid bosses:</strong> Pokémon fanget fra raids får +5 levels når deres type boostes (level 20 → 25, eller 25 → 30 med weather boost)</li>
+        <li><strong>Vilde Pokémon:</strong> Boostede typer spawner oftere og har højere level</li>
+        <li><strong>Angreb:</strong> Moves af boostede typer gør 20% mere skade</li>
+        <li><strong>Stardust:</strong> Du får 25% ekstra stardust for at fange boostede Pokémon</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Weather data
+    const WEATHER_DATA = {
+      sunny: {
+        name: 'Sunny / Clear',
+        icon: '☀️',
+        types: ['Fire', 'Grass', 'Ground']
+      },
+      rainy: {
+        name: 'Rainy',
+        icon: '🌧️',
+        types: ['Water', 'Electric', 'Bug']
+      },
+      partlycloudy: {
+        name: 'Partly Cloudy',
+        icon: '⛅',
+        types: ['Normal', 'Rock']
+      },
+      cloudy: {
+        name: 'Cloudy',
+        icon: '☁️',
+        types: ['Fairy', 'Fighting', 'Poison']
+      },
+      windy: {
+        name: 'Windy',
+        icon: '💨',
+        types: ['Dragon', 'Flying', 'Psychic']
+      },
+      snow: {
+        name: 'Snow',
+        icon: '❄️',
+        types: ['Ice', 'Steel']
+      },
+      fog: {
+        name: 'Fog',
+        icon: '🌫️',
+        types: ['Dark', 'Ghost']
+      }
+    };
+
+    // Type colors
+    const TYPE_COLORS = {
+      'Normal': '#A8A878',
+      'Fire': '#F08030',
+      'Water': '#6890F0',
+      'Electric': '#F8D030',
+      'Grass': '#78C850',
+      'Ice': '#98D8D8',
+      'Fighting': '#C03028',
+      'Poison': '#A040A0',
+      'Ground': '#E0C068',
+      'Flying': '#A890F0',
+      'Psychic': '#F85888',
+      'Bug': '#A8B820',
+      'Rock': '#B8A038',
+      'Ghost': '#705898',
+      'Dragon': '#7038F8',
+      'Dark': '#705848',
+      'Steel': '#B8B8D0',
+      'Fairy': '#EE99AC'
+    };
+
+    function getTextColor(type) {
+      const lightTypes = ['Normal', 'Electric', 'Ground', 'Ice', 'Steel', 'Fairy'];
+      return lightTypes.includes(type) ? 'black' : 'white';
+    }
+
+    function renderWeatherCards() {
+      const grid = document.getElementById('weather-grid');
+      let html = '';
+
+      for (const [key, weather] of Object.entries(WEATHER_DATA)) {
+        html += `
+          <div class="weather-card" data-weather="${key}">
+            <div class="weather-card-header">
+              <span class="weather-card-icon">${weather.icon}</span>
+              <span class="weather-card-name">${weather.name}</span>
+            </div>
+            <h4>Boosted Types:</h4>
+            <div class="boosted-types-list">
+              ${weather.types.map(type => `
+                <span class="type-badge" style="background: ${TYPE_COLORS[type]}; color: ${getTextColor(type)};">
+                  ${type}
+                </span>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      grid.innerHTML = html;
+    }
+
+    // Dark mode
+    function setupDarkMode() {
+      const toggle = document.getElementById('theme-toggle');
+      const savedTheme = localStorage.getItem('theme');
+
+      if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        toggle.querySelector('.theme-icon').textContent = '☀️';
+        toggle.querySelector('.theme-toggle-text').textContent = 'Light Mode';
+      }
+
+      toggle.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+          document.documentElement.removeAttribute('data-theme');
+          localStorage.setItem('theme', 'light');
+          toggle.querySelector('.theme-icon').textContent = '🌙';
+          toggle.querySelector('.theme-toggle-text').textContent = 'Dark Mode';
+        } else {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          localStorage.setItem('theme', 'dark');
+          toggle.querySelector('.theme-icon').textContent = '☀️';
+          toggle.querySelector('.theme-toggle-text').textContent = 'Light Mode';
+        }
+      });
+    }
+
+    // Initialize
+    renderWeatherCards();
+    setupDarkMode();
+  </script>
+</body>
+</html>

@@ -202,16 +202,16 @@ function getPokemonSpriteName(name) {
     // "Zygarde 50%" → "zygarde"
     spriteName = 'zygarde';
   } else if (spriteName.includes('galarian darmanitan')) {
-    // "Galarian Darmanitan" → "darmanitan-galar-standard"
-    spriteName = 'darmanitan-galar-standard';
+    // "Galarian Darmanitan" → "darmanitan-galarian-standard"
+    spriteName = 'darmanitan-galarian-standard';
   } else if (spriteName.includes('ice rider calyrex')) {
     // "Ice Rider Calyrex" → "calyrex-ice-rider"
     spriteName = 'calyrex-ice-rider';
   } else if (spriteName.includes('shadow rider calyrex')) {
     // "Shadow Rider Calyrex" → "calyrex-shadow-rider"
     spriteName = 'calyrex-shadow-rider';
-  } else if (spriteName.includes('mega')) {
-    // "Mega Rayquaza" → "rayquaza-mega"
+  } else if (spriteName.startsWith('mega ')) {
+    // "Mega Rayquaza" → "rayquaza-mega" (men ikke "Meganium")
     spriteName = spriteName.replace('mega ', '') + '-mega';
   } else if (spriteName.includes('crowned sword')) {
     // "Zacian Crowned Sword" → "zacian-crowned"
@@ -364,19 +364,33 @@ function displayPokemon(pokemonList) {
     const card = document.createElement('div');
     card.className = 'pokemon-card';
 
+    // Tilføj type gradient baggrund
+    card.style.background = getTypeGradient(pokemon.types);
+
     // Lav sprite URL med vores hjælpe-funktion
     const spriteUrl = getSpriteUrl(pokemon.name, false);
 
-    // Lav difficulty badge baseret på raid data
+    // Lav difficulty badge baseret på min_players_duo (beregnet fra TTW)
     let difficultyBadge = '';
-    if (pokemon.raid_soloable === 1) {
-      difficultyBadge = '<span class="difficulty-badge solo">⭐ SOLO mulig!</span>';
-    } else if (pokemon.min_players_duo === 1) {
-      difficultyBadge = '<span class="difficulty-badge duo">💪 Duo mulig</span>';
-    } else if (pokemon.min_players_trio === 1) {
-      difficultyBadge = '<span class="difficulty-badge trio">👥 Trio mulig</span>';
-    } else if (pokemon.min_players_trio === 0) {
-      difficultyBadge = '<span class="difficulty-badge hard">⚠️ 4+ spillere</span>';
+    const players = pokemon.min_players_duo;
+    if (players) {
+      if (players === '1 (solo)' || players === '1') {
+        difficultyBadge = '<span class="difficulty-badge solo">⭐ 1 spiller (solo)</span>';
+      } else if (players === '1-2') {
+        difficultyBadge = '<span class="difficulty-badge duo">💪 1-2 spillere</span>';
+      } else if (players === '2') {
+        difficultyBadge = '<span class="difficulty-badge duo">💪 2 spillere</span>';
+      } else if (players === '2-3') {
+        difficultyBadge = '<span class="difficulty-badge trio">👥 2-3 spillere</span>';
+      } else if (players === '3') {
+        difficultyBadge = '<span class="difficulty-badge trio">👥 3 spillere</span>';
+      } else if (players === '3-4') {
+        difficultyBadge = '<span class="difficulty-badge hard">⚠️ 3-4 spillere</span>';
+      } else if (players === '4' || players === '4-5') {
+        difficultyBadge = '<span class="difficulty-badge hard">⚠️ ' + players + ' spillere</span>';
+      } else {
+        difficultyBadge = '<span class="difficulty-badge hard">⚠️ ' + players + ' spillere</span>';
+      }
     }
 
     // Sæt indhold i kortet med billede og compare checkbox
@@ -444,41 +458,63 @@ function displayPokemonDetails(pokemon) {
     const ttw = pokemon.estimated_ttw;
     const minutes = Math.floor(ttw / 60);
     const seconds = ttw % 60;
+    const players = pokemon.min_players_duo || '';
 
     let difficultyInfo = '';
-    if (pokemon.raid_soloable === 1) {
-      difficultyInfo = `
-        <div class="raid-difficulty solo">
-          <h4>⭐ SOLO MULIG!</h4>
-          <p>Denne raid kan klares alene med de rigtige counters!</p>
-          <p class="tip">💡 Tip: Brug level 40-50 counters med Weather Boost for sikkerhed</p>
-        </div>
-      `;
-    } else if (pokemon.min_players_duo === 1) {
-      difficultyInfo = `
-        <div class="raid-difficulty easy">
-          <h4>💪 Duo Mulig!</h4>
-          <p>Denne boss kan slås af 2 spillere med gode counters.</p>
-          <p class="tip">💡 Tip: Brug level 40+ counters med super-effective moves</p>
-        </div>
-      `;
-    } else if (pokemon.min_players_trio === 1) {
-      difficultyInfo = `
-        <div class="raid-difficulty medium">
-          <h4>👥 Trio Mulig</h4>
-          <p>Denne boss kræver minimum 3 spillere med stærke counters.</p>
-          <p class="tip">💡 Tip: Best friend bonus og vejr boost hjælper meget!</p>
-        </div>
-      `;
+    let difficultyClass = 'hard';
+    let difficultyTitle = '';
+    let difficultyDesc = '';
+    let difficultyTip = '';
+
+    if (players === '1 (solo)' || players === '1') {
+      difficultyClass = 'solo';
+      difficultyTitle = '⭐ SOLO MULIG!';
+      difficultyDesc = 'Denne raid kan klares alene med de rigtige counters!';
+      difficultyTip = 'Brug level 35+ counters for sikkerhed';
+    } else if (players === '1-2') {
+      difficultyClass = 'solo';
+      difficultyTitle = '⭐ Meget Let';
+      difficultyDesc = 'Kan klares solo eller nemt med 2 spillere.';
+      difficultyTip = 'Brug super-effective counters';
+    } else if (players === '2') {
+      difficultyClass = 'easy';
+      difficultyTitle = '💪 Duo Mulig';
+      difficultyDesc = 'Kan klares af 2 spillere med gode counters.';
+      difficultyTip = 'Brug level 35+ counters med super-effective moves';
+    } else if (players === '2-3') {
+      difficultyClass = 'easy';
+      difficultyTitle = '💪 Let';
+      difficultyDesc = 'Kan klares af 2-3 spillere med solide teams.';
+      difficultyTip = 'Best friend bonus hjælper!';
+    } else if (players === '3') {
+      difficultyClass = 'medium';
+      difficultyTitle = '👥 Trio Mulig';
+      difficultyDesc = 'Kræver 3 spillere med stærke counters.';
+      difficultyTip = 'Best friend bonus og vejr boost hjælper meget!';
+    } else if (players === '3-4') {
+      difficultyClass = 'medium';
+      difficultyTitle = '👥 Medium';
+      difficultyDesc = 'Kræver 3-4 spillere med gode teams.';
+      difficultyTip = 'Koordiner med din gruppe';
+    } else if (players === '4' || players === '4-5') {
+      difficultyClass = 'hard';
+      difficultyTitle = '⚠️ Svær';
+      difficultyDesc = `Kræver ${players} spillere med stærke teams.`;
+      difficultyTip = 'Brug Mega Evolution for ekstra damage!';
     } else {
-      difficultyInfo = `
-        <div class="raid-difficulty hard">
-          <h4>⚠️ Svær Raid Boss</h4>
-          <p>Denne boss kræver minimum 4-5 spillere med optimale teams.</p>
-          <p class="tip">💡 Tip: Koordiner med dit raid gruppe og brug Mega Evolution!</p>
-        </div>
-      `;
+      difficultyClass = 'hard';
+      difficultyTitle = '⚠️ Meget Svær';
+      difficultyDesc = `Kræver ${players} spillere med optimale teams.`;
+      difficultyTip = 'Koordiner med dit raid gruppe og brug Mega Evolution!';
     }
+
+    difficultyInfo = `
+      <div class="raid-difficulty ${difficultyClass}">
+        <h4>${difficultyTitle}</h4>
+        <p>${difficultyDesc}</p>
+        <p class="tip">💡 ${difficultyTip}</p>
+      </div>
+    `;
 
     raidSimulatorSection = `
       <div class="raid-simulator-section">
@@ -486,23 +522,13 @@ function displayPokemonDetails(pokemon) {
         ${difficultyInfo}
         <div class="raid-stats">
           <div class="raid-stat-box">
-            <span class="raid-stat-label">⏱️ Estimeret tid</span>
-            <span class="raid-stat-value">${minutes}:${seconds.toString().padStart(2, '0')} min</span>
+            <span class="raid-stat-label">⏱️ TTW (Top counters)</span>
+            <span class="raid-stat-value">${formatTTW(ttw)}</span>
           </div>
           <div class="raid-stat-box">
-            <span class="raid-stat-label">👥 Anbefalet spillere</span>
-            <span class="raid-stat-value">${pokemon.raid_soloable === 1 ? '1 (Solo!)' : pokemon.min_players_duo === 1 ? '2-3' : pokemon.min_players_trio === 1 ? '3-4' : '4-6'}</span>
+            <span class="raid-stat-label">👥 Spillere krævet</span>
+            <span class="raid-stat-value">${players || 'Ukendt'}</span>
           </div>
-        </div>
-        <div class="raid-tips">
-          <h4>📋 Raid Tips:</h4>
-          <ul>
-            <li>✓ Brug de bedste counters vist nedenfor</li>
-            <li>✓ Power up dine Pokémon til mindst level 30-35</li>
-            <li>✓ Tjek vejret - det giver 20% damage boost!</li>
-            <li>✓ Best friend bonus giver 10% ekstra damage</li>
-            ${pokemon.min_players_duo === 1 ? '<li>✓ Relobby hvis nødvendigt - du har tid!</li>' : ''}
-          </ul>
         </div>
       </div>
     `;
@@ -658,16 +684,91 @@ function showPokemonList() {
   document.getElementById('pokemon-list').style.display = 'grid';
 }
 
+// Mapping fra counter-navne (fra PokemonGOHub) til vores database-navne
+function normalizeCounterName(name) {
+  const nameMapping = {
+    // Zacian varianter
+    'Crowned Sword Zacian': 'Zacian Crowned Sword',
+    'Hero Zacian': 'Zacian Hero',
+    // Zamazenta varianter
+    'Crowned Shield Zamazenta': 'Zamazenta Crowned Shield',
+    'Hero Zamazenta': 'Zamazenta Hero',
+    // Calyrex varianter
+    'Shadow Rider Calyrex': 'Calyrex Shadow Rider',
+    'Ice Rider Calyrex': 'Calyrex Ice Rider',
+    // Necrozma varianter
+    'Dusk Mane Necrozma': 'Necrozma Dusk Mane',
+    'Dawn Wings Necrozma': 'Necrozma Dawn Wings',
+    // Urshifu varianter
+    'Single Strike Urshifu': 'Urshifu Single Strike',
+    'Rapid Strike Urshifu': 'Urshifu Rapid Strike',
+    // Giratina varianter
+    'Origin Giratina': 'Giratina Origin',
+    'Altered Giratina': 'Giratina Altered',
+    // Deoxys varianter
+    'Attack Deoxys': 'Deoxys Attack',
+    'Defense Deoxys': 'Deoxys Defense',
+    'Speed Deoxys': 'Deoxys Speed',
+    'Normal Deoxys': 'Deoxys Normal',
+    // Hoopa varianter
+    'Unbound Hoopa': 'Hoopa Unbound',
+    'Confined Hoopa': 'Hoopa Confined',
+    // Forme varianter (fra PokemonGOHub format)
+    'Landorus (Therian Forme)': 'Landorus Therian',
+    'Landorus (Incarnate Forme)': 'Landorus Incarnate',
+    'Thundurus (Therian Forme)': 'Thundurus Therian',
+    'Thundurus (Incarnate Forme)': 'Thundurus Incarnate',
+    'Tornadus (Therian Forme)': 'Tornadus Therian',
+    'Tornadus (Incarnate Forme)': 'Tornadus Incarnate',
+    'Enamorus (Therian Forme)': 'Enamorus Therian',
+    'Enamorus (Incarnate Forme)': 'Enamorus Incarnate',
+    'Shaymin (Sky Forme)': 'Shaymin Sky',
+    'Shaymin (Land Forme)': 'Shaymin Land',
+    'Keldeo (Resolute Forme)': 'Keldeo',
+    'Keldeo (Ordinary Forme)': 'Keldeo',
+    // Shadow Therian forms
+    'Shadow Thundurus (Therian Forme)': 'Shadow Thundurus Therian',
+    'Shadow Landorus (Therian Forme)': 'Shadow Landorus Therian',
+    // Therian/Incarnate (uden parenteser)
+    'Therian Landorus': 'Landorus Therian',
+    'Incarnate Landorus': 'Landorus Incarnate',
+    'Therian Tornadus': 'Tornadus Therian',
+    'Incarnate Tornadus': 'Tornadus Incarnate',
+    'Therian Thundurus': 'Thundurus Therian',
+    'Incarnate Thundurus': 'Thundurus Incarnate',
+    'Therian Enamorus': 'Enamorus Therian',
+    'Incarnate Enamorus': 'Enamorus Incarnate',
+    'Sky Shaymin': 'Shaymin Sky',
+    'Land Shaymin': 'Shaymin Land',
+  };
+
+  return nameMapping[name] || name;
+}
+
 // Funktion der finder Pokémon baseret på navn
 async function loadPokemonByName(name) {
   console.log('Søger efter Pokémon:', name);
+
+  // Normaliser navnet først (konverter fra counter-format til vores format)
+  const normalizedName = normalizeCounterName(name);
+  console.log('Normaliseret navn:', normalizedName);
 
   // Hent alle Pokémon og find den rigtige
   const response = await fetch('/api/pokemon');
   const allPokemon = await response.json();
 
-  // Find Pokémon der matcher navnet
-  const pokemon = allPokemon.find(p => p.name === name);
+  // Find Pokémon der matcher navnet (prøv både originalt og normaliseret)
+  let pokemon = allPokemon.find(p => p.name === normalizedName);
+
+  // Hvis ikke fundet med normaliseret navn, prøv originalt navn
+  if (!pokemon) {
+    pokemon = allPokemon.find(p => p.name === name);
+  }
+
+  // Prøv også case-insensitive søgning
+  if (!pokemon) {
+    pokemon = allPokemon.find(p => p.name.toLowerCase() === normalizedName.toLowerCase());
+  }
 
   if (pokemon) {
     // Hvis fundet, load detaljer
@@ -682,6 +783,8 @@ async function loadPokemonByName(name) {
 let allPokemonData = [];
 let activeCategories = []; // Array af valgte kategorier (tom = alle)
 let activeSortBy = 'pokedex';
+let activeRangeMin = null;
+let activeRangeMax = null;
 
 // Funktion der filtrerer Pokémon baseret på søgning og kategori
 function filterPokemon(searchTerm) {
@@ -705,11 +808,34 @@ function filterPokemon(searchTerm) {
     });
   }
 
+  // Filtrer efter range (hvis sat)
+  if (activeRangeMin !== null || activeRangeMax !== null) {
+    filtered = filtered.filter(pokemon => {
+      const value = getRangeValue(pokemon, activeSortBy);
+      if (value === null) return true; // Behold hvis ingen værdi
+      if (activeRangeMin !== null && value < activeRangeMin) return false;
+      if (activeRangeMax !== null && value > activeRangeMax) return false;
+      return true;
+    });
+  }
+
   // Vis de filtrerede resultater
   displayPokemon(filtered);
 
   // Vis antal resultater i console
   console.log(`Viser ${filtered.length} Pokémon (kategorier: ${activeCategories.length > 0 ? activeCategories.join(', ') : 'alle'}, søgning: "${searchTerm}")`);
+}
+
+// Hent værdi for range filter baseret på sorteringstype
+function getRangeValue(pokemon, sortBy) {
+  switch (sortBy) {
+    case 'cp': return pokemon.max_cp || 0;
+    case 'attack': return pokemon.attack || 0;
+    case 'defense': return pokemon.defense || 0;
+    case 'hp': return pokemon.hp || 0;
+    case 'pokedex': return pokemon.pokedex_number || 0;
+    default: return null;
+  }
 }
 
 // Opdater loadPokemon til at gemme data globalt
@@ -817,6 +943,13 @@ function setupSorting() {
       // Hent sorteringsmetode fra data-sort attributten
       activeSortBy = button.getAttribute('data-sort');
 
+      // Nulstil range filter når man skifter sortering
+      activeRangeMin = null;
+      activeRangeMax = null;
+
+      // Opdater range filter UI
+      updateRangeFilter(activeSortBy);
+
       // Re-filtrer Pokémon (brug current søgning og filter)
       const searchInput = document.getElementById('search-input');
       filterPokemon(searchInput.value);
@@ -825,6 +958,162 @@ function setupSorting() {
       console.log('Sortering:', activeSortBy);
     });
   });
+
+  // Setup range filter
+  setupRangeFilter();
+}
+
+// Presets for hver sorteringstype
+const rangePresets = {
+  cp: [
+    { label: 'Under 2000', min: 0, max: 1999 },
+    { label: '2000-3000', min: 2000, max: 3000 },
+    { label: '3000-4000', min: 3000, max: 4000 },
+    { label: '4000-5000', min: 4000, max: 5000 },
+    { label: '5000+', min: 5000, max: 9999 },
+    { label: 'Mega/Primal (6000+)', min: 6000, max: 9999 }
+  ],
+  attack: [
+    { label: 'Under 200', min: 0, max: 199 },
+    { label: '200-250', min: 200, max: 250 },
+    { label: '250-300', min: 250, max: 300 },
+    { label: '300+', min: 300, max: 999 }
+  ],
+  defense: [
+    { label: 'Under 150', min: 0, max: 149 },
+    { label: '150-200', min: 150, max: 200 },
+    { label: '200-250', min: 200, max: 250 },
+    { label: '250+', min: 250, max: 999 }
+  ],
+  hp: [
+    { label: 'Under 150', min: 0, max: 149 },
+    { label: '150-200', min: 150, max: 200 },
+    { label: '200-250', min: 200, max: 250 },
+    { label: '250+', min: 250, max: 999 }
+  ],
+  pokedex: [
+    { label: 'Gen 1 (1-151)', min: 1, max: 151 },
+    { label: 'Gen 2 (152-251)', min: 152, max: 251 },
+    { label: 'Gen 3 (252-386)', min: 252, max: 386 },
+    { label: 'Gen 4 (387-493)', min: 387, max: 493 },
+    { label: 'Gen 5 (494-649)', min: 494, max: 649 },
+    { label: 'Gen 6 (650-721)', min: 650, max: 721 },
+    { label: 'Gen 7 (722-809)', min: 722, max: 809 },
+    { label: 'Gen 8 (810-905)', min: 810, max: 905 },
+    { label: 'Gen 9 (906+)', min: 906, max: 1500 }
+  ]
+};
+
+// Opdater range filter baseret på valgt sortering
+function updateRangeFilter(sortBy) {
+  const rangeFilter = document.getElementById('range-filter');
+  const presetsContainer = document.getElementById('range-presets');
+  const minInput = document.getElementById('range-min');
+  const maxInput = document.getElementById('range-max');
+
+  // Skjul range filter for navn-sortering
+  if (sortBy === 'name') {
+    rangeFilter.style.display = 'none';
+    return;
+  }
+
+  // Vis range filter
+  rangeFilter.style.display = 'block';
+
+  // Nulstil inputs
+  minInput.value = '';
+  maxInput.value = '';
+
+  // Opdater labels
+  const labels = {
+    cp: 'CP',
+    attack: 'Attack',
+    defense: 'Defense',
+    hp: 'HP',
+    pokedex: 'Pokédex Nr.'
+  };
+  document.getElementById('range-label-min').textContent = `Min ${labels[sortBy]}:`;
+  document.getElementById('range-label-max').textContent = `Max ${labels[sortBy]}:`;
+
+  // Opdater presets
+  const presets = rangePresets[sortBy] || [];
+  presetsContainer.innerHTML = presets.map(preset => `
+    <button class="range-preset-btn" data-min="${preset.min}" data-max="${preset.max}">
+      ${preset.label}
+    </button>
+  `).join('');
+
+  // Tilføj event listeners til presets
+  presetsContainer.querySelectorAll('.range-preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Fjern active fra alle presets
+      presetsContainer.querySelectorAll('.range-preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Sæt range værdier
+      const min = parseInt(btn.getAttribute('data-min'));
+      const max = parseInt(btn.getAttribute('data-max'));
+      minInput.value = min;
+      maxInput.value = max;
+
+      // Anvend filter
+      applyRangeFilter();
+    });
+  });
+}
+
+// Setup range filter event listeners
+function setupRangeFilter() {
+  const applyBtn = document.getElementById('apply-range');
+  const clearBtn = document.getElementById('clear-range');
+  const minInput = document.getElementById('range-min');
+  const maxInput = document.getElementById('range-max');
+
+  applyBtn.addEventListener('click', applyRangeFilter);
+  clearBtn.addEventListener('click', clearRangeFilter);
+
+  // Enter-tast anvender filter
+  minInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') applyRangeFilter();
+  });
+  maxInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') applyRangeFilter();
+  });
+}
+
+// Anvend range filter
+function applyRangeFilter() {
+  const minInput = document.getElementById('range-min');
+  const maxInput = document.getElementById('range-max');
+
+  activeRangeMin = minInput.value !== '' ? parseInt(minInput.value) : null;
+  activeRangeMax = maxInput.value !== '' ? parseInt(maxInput.value) : null;
+
+  // Re-filtrer
+  const searchInput = document.getElementById('search-input');
+  filterPokemon(searchInput.value);
+
+  console.log(`Range filter: ${activeRangeMin || 'min'} - ${activeRangeMax || 'max'}`);
+}
+
+// Ryd range filter
+function clearRangeFilter() {
+  activeRangeMin = null;
+  activeRangeMax = null;
+
+  const minInput = document.getElementById('range-min');
+  const maxInput = document.getElementById('range-max');
+  minInput.value = '';
+  maxInput.value = '';
+
+  // Fjern active fra presets
+  document.querySelectorAll('.range-preset-btn').forEach(btn => btn.classList.remove('active'));
+
+  // Re-filtrer
+  const searchInput = document.getElementById('search-input');
+  filterPokemon(searchInput.value);
+
+  console.log('Range filter cleared');
 }
 
 // Dark mode functionality
@@ -1093,56 +1382,70 @@ const TYPE_COLORS = {
   'Fairy': '#EE99AC'
 };
 
-// Setup weather selector
-function setupWeather() {
-  const weatherButtons = document.querySelectorAll('.weather-btn');
-  const boostInfo = document.getElementById('weather-boost-info');
+// Funktion til at lave gradient baggrund baseret på Pokémon type(r)
+function getTypeGradient(types) {
+  // Split types (f.eks. "Fire/Flying" → ["Fire", "Flying"])
+  const typeArray = types.split('/').map(t => t.trim());
 
-  weatherButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      // Remove active from all buttons
-      weatherButtons.forEach(btn => btn.classList.remove('active'));
+  // Hent farver for hver type
+  const color1 = TYPE_COLORS[typeArray[0]] || '#888888';
+  const color2 = typeArray[1] ? TYPE_COLORS[typeArray[1]] : color1;
 
-      // Add active to clicked button
-      button.classList.add('active');
-
-      // Get selected weather
-      const weather = button.getAttribute('data-weather');
-
-      // Show/hide boost info
-      if (weather === 'none') {
-        boostInfo.style.display = 'none';
-      } else {
-        showWeatherBoostInfo(weather);
-        boostInfo.style.display = 'block';
-      }
-    });
-  });
+  // Lav gradient - svag toning (20% opacity) så tekst stadig er læselig
+  if (typeArray.length === 1) {
+    // Single type: Svag toning fra top til bund
+    return `linear-gradient(180deg, ${color1}30 0%, ${color1}10 100%)`;
+  } else {
+    // Dual type: Diagonal gradient mellem de to farver
+    return `linear-gradient(135deg, ${color1}35 0%, ${color1}20 40%, ${color2}20 60%, ${color2}35 100%)`;
+  }
 }
 
-// Show weather boost information
-function showWeatherBoostInfo(weather) {
-  const boostInfo = document.getElementById('weather-boost-info');
-  const boostedTypes = WEATHER_BOOSTS[weather] || [];
+// Setup weather dropdown
+function setupWeather() {
+  const weatherToggle = document.getElementById('weather-toggle');
+  const weatherDropdown = document.getElementById('weather-dropdown');
+  const weatherOptions = document.querySelectorAll('.weather-option');
+  const currentIcon = document.getElementById('weather-current-icon');
 
-  if (boostedTypes.length === 0) {
-    boostInfo.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Intet valgt</p>';
-    return;
-  }
+  if (!weatherToggle || !weatherDropdown) return;
 
-  let html = '<h4>💪 Boosted typer</h4>';
-  html += '<div class="boosted-types">';
-
-  boostedTypes.forEach(type => {
-    const color = TYPE_COLORS[type];
-    const textColor = (type === 'Normal' || type === 'Electric' || type === 'Ground') ? 'black' : 'white';
-    html += `<div class="boosted-type-badge" style="background: ${color}; color: ${textColor};">${type}</div>`;
+  // Toggle dropdown
+  weatherToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    weatherDropdown.classList.toggle('show');
   });
 
-  html += '</div>';
-  html += '<p style="text-align: center; margin-top: 15px; color: var(--text-secondary); font-size: 14px;">Pokémon af disse typer får +5 levels i vejret (level 20 → 25 for raids)</p>';
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!weatherDropdown.contains(e.target) && e.target !== weatherToggle) {
+      weatherDropdown.classList.remove('show');
+    }
+  });
 
-  boostInfo.innerHTML = html;
+  // Handle weather selection
+  weatherOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      // Remove active from all options
+      weatherOptions.forEach(opt => opt.classList.remove('active'));
+
+      // Add active to clicked option
+      option.classList.add('active');
+
+      // Get selected weather
+      const weather = option.getAttribute('data-weather');
+
+      // Update toggle icon
+      const icon = option.querySelector('.weather-icon').textContent;
+      currentIcon.textContent = icon;
+
+      // Close dropdown
+      weatherDropdown.classList.remove('show');
+
+      // Store selected weather (for use elsewhere if needed)
+      window.currentWeather = weather;
+    });
+  });
 }
 
 // Start programmet når siden er loadet

@@ -114,7 +114,7 @@
 .type-select-btn.Water { background: #6890F0; }
 .type-select-btn.Electric { background: #F8D030; color: black; }
 .type-select-btn.Grass { background: #78C850; }
-.type-select-btn.Ice { background: #98D8D8; }
+.type-select-btn.Ice { background: #98D8D8; color: black; }
 .type-select-btn.Fighting { background: #C03028; }
 .type-select-btn.Poison { background: #A040A0; }
 .type-select-btn.Ground { background: #E0C068; color: black; }
@@ -125,8 +125,28 @@
 .type-select-btn.Ghost { background: #705898; }
 .type-select-btn.Dragon { background: #7038F8; }
 .type-select-btn.Dark { background: #2C2C2C; border: 2px solid #1a1a1a; }
-.type-select-btn.Steel { background: #B8B8D0; }
-.type-select-btn.Fairy { background: #EE99AC; }
+.type-select-btn.Steel { background: #B8B8D0; color: black; }
+.type-select-btn.Fairy { background: #EE99AC; color: black; }
+
+/* Type effectiveness badge colors (for results display) */
+.type-effectiveness-badge.Normal { background: #C0C0C0; color: black; }
+.type-effectiveness-badge.Fire { background: #F08030; }
+.type-effectiveness-badge.Water { background: #6890F0; }
+.type-effectiveness-badge.Electric { background: #F8D030; color: black; }
+.type-effectiveness-badge.Grass { background: #78C850; }
+.type-effectiveness-badge.Ice { background: #98D8D8; color: black; }
+.type-effectiveness-badge.Fighting { background: #C03028; }
+.type-effectiveness-badge.Poison { background: #A040A0; }
+.type-effectiveness-badge.Ground { background: #E0C068; color: black; }
+.type-effectiveness-badge.Flying { background: #A890F0; }
+.type-effectiveness-badge.Psychic { background: #F85888; }
+.type-effectiveness-badge.Bug { background: #A8B820; }
+.type-effectiveness-badge.Rock { background: #B8A038; }
+.type-effectiveness-badge.Ghost { background: #705898; }
+.type-effectiveness-badge.Dragon { background: #7038F8; }
+.type-effectiveness-badge.Dark { background: #2C2C2C; }
+.type-effectiveness-badge.Steel { background: #B8B8D0; color: black; }
+.type-effectiveness-badge.Fairy { background: #EE99AC; color: black; }
 
 /* Results container */
 .type-results-container {
